@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"name": "APWorld",
+			"path": "apworld/ys_chronicles"
+		},
+		{
+			"name": "Tools",
+			"path": "tools"
+		},
+		{
+			"name": "Docs",
+			"path": "docs"
+		}
+	],
+	"settings": {
+		"python.defaultInterpreterPath": "${workspaceFolder}/../venv/bin/python",
+		"python.analysis.extraPaths": [
+			"${workspaceFolder}/../tools/archipelago/Archipelago-0.6.6"
+		],
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/*.pyc": true,
+			".DS_Store": true
+		}
+	}
+}
