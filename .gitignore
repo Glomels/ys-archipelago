@@ -40,14 +40,14 @@ snapshots/
 *.apworld
 
 # But include prebuilt apworld in patch/
-!patch/*.apworld
+!player/*.apworld
 
 # Windows executables (cross-compiled)
 *.exe
 *.dll
 
 # But include precompiled patch DLLs
-!patch/*.dll
+!player/*.dll
 
 # Lock files
 *.lock

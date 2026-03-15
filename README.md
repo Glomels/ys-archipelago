@@ -12,16 +12,13 @@ An [Archipelago](https://archipelago.gg) multiworld randomizer for **Ys I Chroni
 ### Quick install (precompiled)
 
 1. Back up your game's `steam_api.dll` by renaming it to `steam_api_orig.dll`
-2. Copy both DLLs from the `patch/` directory into the same folder as `ys1plus.exe`:
+2. Copy from the `player/` directory into the same folder as `ys1plus.exe`:
    - `steam_api.dll` — proxy that loads the AP client
    - `aphook.dll` — full AP client
-3. Create `ap_connect.txt` in the same folder as `ys1plus.exe`:
-   ```
-   server=localhost:38281
-   slot=Adol
-   password=
-   ```
-4. Launch the game normally
+   - `ap_connect.txt` — edit with your server info
+3. Install `player/ys_chronicles.apworld` into your Archipelago worlds directory
+4. Edit `player/Ys I Chronicles.yaml` to configure options, then generate a seed
+5. Launch the game normally
 
 ### Build from source
 
