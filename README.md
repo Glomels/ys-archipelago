@@ -20,11 +20,7 @@ Randomizes item locations across the game — chests, NPC gifts, boss rewards, a
 ## Requirements
 
 - **Ys I & II Chronicles+** (Steam, PC version)
-- **CrossOver** or **Wine** (for macOS/Linux)
 - **Archipelago** 0.6.6+
-- **i686-w64-mingw32-gcc** — 32-bit cross-compiler for building the DLL
-  - macOS: `brew install mingw-w64`
-  - Linux: `apt install gcc-mingw-w64-i686`
 
 ## Setup
 
