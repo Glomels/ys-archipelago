@@ -43,6 +43,9 @@ snapshots/
 *.exe
 *.dll
 
+# But include precompiled patch DLLs
+!patch/*.dll
+
 # Lock files
 *.lock
 
