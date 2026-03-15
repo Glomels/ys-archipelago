@@ -1,3 +1,3 @@
-server=localhost:38281
+server=archipelago.gg:38281
 slot=Adol
 password=
