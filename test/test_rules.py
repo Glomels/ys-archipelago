@@ -76,6 +76,12 @@ class TestLocationRules(YsChroniclesTestBase):
 
     def test_reahs_gift_requires_evil_ring_and_necklace(self) -> None:
         self.multiworld.state = CollectionState(self.multiworld)
+        # Reah is in Tower Mid — need tower access first
+        self.collect_by_name([
+            "Silver Sword", "Silver Shield", "Silver Armor",
+            "Book of Ys (Hadal)", "Book of Ys (Tovah)", "Book of Ys (Dabbie)",
+            "Darm Key",
+        ])
         self.assertFalse(self.can_reach_location("Reah's Gift"))
 
         self.collect_by_name("Evil Ring")
