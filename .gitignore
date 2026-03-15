@@ -60,3 +60,4 @@ guide.md
 
 # Command file (ephemeral)
 command.md
+*.code-workspace
