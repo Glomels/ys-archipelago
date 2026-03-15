@@ -39,7 +39,7 @@ fi
 
 # Step 1: Compile DLLs
 echo "[1/4] Compiling aphook.dll..."
-$CC -shared -O2 -o "$TOOLS_DIR/aphook.dll" "$TOOLS_DIR/aphook.c" -lws2_32 -lkernel32
+$CC -shared -O2 -o "$TOOLS_DIR/aphook.dll" "$SCRIPT_DIR/aphook.c" -lws2_32 -lkernel32
 echo "  OK"
 
 echo "[1/4] Compiling steam_api.dll (proxy)..."
