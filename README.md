@@ -24,10 +24,10 @@ An [Archipelago](https://archipelago.gg) multiworld randomizer for **Ys I Chroni
 
 ```bash
 # Build everything
-./build_apworld.sh
+tools/build_apworld.sh
 
 # Deploy to game directory
-./setup_mod.sh [server] [slot] [password]
+tools/setup_mod.sh [server] [slot] [password]
 ```
 
 ## How It Works
