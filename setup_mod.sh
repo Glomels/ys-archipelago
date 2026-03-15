@@ -39,12 +39,12 @@ fi
 
 # Step 1: Compile DLLs
 echo "[1/4] Compiling aphook.dll..."
-$CC -shared -O2 -o "$TOOLS_DIR/aphook.dll" "$SCRIPT_DIR/aphook.c" -lws2_32 -lkernel32
+$CC -shared -O2 -o "$TOOLS_DIR/aphook.dll" "$SCRIPT_DIR/src/aphook.c" -lws2_32 -lkernel32
 echo "  OK"
 
 echo "[1/4] Compiling steam_api.dll (proxy)..."
 $CC -shared -O2 -o "$TOOLS_DIR/steam_api.dll" \
-    "$TOOLS_DIR/steam_api_proxy.c" "$TOOLS_DIR/steam_api_proxy.def" -lkernel32
+    "$SCRIPT_DIR/src/steam_api_proxy.c" "$SCRIPT_DIR/src/steam_api_proxy.def" -lkernel32
 echo "  OK"
 
 # Step 2: Backup original steam_api.dll
