@@ -1,109 +1,64 @@
-# Ys I & II Chronicles - Archipelago Integration
+# Ys I Chronicles — Archipelago Randomizer
 
-An Archipelago multiworld randomizer integration for Ys I & II Chronicles (PSP).
+An [Archipelago](https://archipelago.gg) multiworld randomizer for **Ys I Chronicles+** (Steam PC version).
 
-## Project Status
+## Overview
 
-🔬 **Active Development** - Memory research ongoing, core tools functional
+Randomizes item locations across the game — chests, NPC gifts, boss rewards, and shop purchases become location checks that can contain any item from the pool. Connect with other Archipelago players for multiworld sessions.
 
-## Structure
+### Features
 
-```
-ys-archipelago/
-├── docs/
-│   ├── memory_map.md    # Known memory addresses
-│   ├── locations.md     # Item location tracking
-│   └── items.md         # Item list and classifications
-├── tools/
-│   ├── memory_gui.py    # GUI for exploring/testing memory flags
-│   ├── memory_diff.py   # Snapshot comparison for flag discovery
-│   └── client/
-│       └── ys_client.py # Archipelago client for PPSSPP
-└── world/
-    └── __init__.py      # Archipelago world definition (WIP)
-```
-
-## Quick Start (macOS)
-
-```bash
-# Run the setup script
-./setup_mac.sh
-
-# Activate the virtual environment
-source venv/bin/activate
-
-# Start PPSSPP with debugger enabled (port 54453)
-# Then run the memory GUI
-python tools/memory_gui.py
-```
+- **72 randomized locations** — chests, NPC gifts, bosses, and 13 shop purchases
+- **51 items** in the pool — weapons, armor, shields, rings, keys, quest items, books, consumables
+- **Full in-process AP client** — DLL injected into the game handles everything automatically
+- **On-screen status** — connection status displayed in-game
+- **Save sync** — AP server is source of truth; game state re-syncs on every save load
+- **Tower safety** — Darm Tower point-of-no-return is guarded by the client
+- **Death Link** support
+- **Configurable options** — shuffle categories, goals, XP/gold multipliers, starting weapon
 
 ## Requirements
 
-- PPSSPP emulator with remote debugger enabled
-- Ys I & II Chronicles (USA) ISO - ULUS-10547
-- Python 3.11+
-- macOS (setup script downloads Archipelago 0.6.6 for macOS x64)
+- **Ys I & II Chronicles+** (Steam, PC version)
+- **CrossOver** or **Wine** (for macOS/Linux)
+- **Archipelago** 0.6.6+
+- **i686-w64-mingw32-gcc** — 32-bit cross-compiler for building the DLL
+  - macOS: `brew install mingw-w64`
+  - Linux: `apt install gcc-mingw-w64-i686`
 
-## Development Roadmap
+## Setup
 
-### Phase 1: Research
-- [x] Map item memory addresses (dual-array system: ownership + discovered)
-- [x] Map player stats (HP, Attack, Defense, Gold)
-- [x] Map equipped items
-- [x] Map chest flags (sequential array at 0x0175CB8)
-- [ ] Map boss defeated flags
-- [ ] Map progression triggers
+See [SETUP.md](SETUP.md) for full installation and configuration instructions.
 
-### Phase 2: Client Development
-- [x] PPSSPP memory interface (WebSocket)
-- [x] Item ownership read/write
-- [x] Memory diff tool for flag discovery
-- [x] GUI for memory exploration
-- [ ] Location check detection
-- [ ] Item receiving/injection
-- [ ] Game state synchronization
+```bash
+# Build everything
+./build_apworld.sh
 
-### Phase 3: World Development
-- [x] Define all items with IDs (52 items mapped)
-- [ ] Define all locations with IDs
-- [ ] Create region graph
-- [ ] Implement access logic
-- [ ] Add randomization options
+# Deploy to game directory
+./setup_mod.sh [server] [slot] [password]
+```
 
-### Phase 4: Testing & Polish
-- [ ] Single-world testing
-- [ ] Multiworld testing
-- [ ] Logic validation
-- [ ] Documentation
+## How It Works
 
-## Key Discoveries
+The mod injects `aphook.dll` into the game via a `steam_api.dll` proxy. The DLL:
 
-### Dual-Array Item System
-Items use two parallel arrays at:
-- **Ownership**: `0x0175DB4` - Whether you have the item (0/1)
-- **Discovered**: `0x01764A0` - Whether item appears in inventory menu (0/1)
+1. **Hooks `give_item()`** — intercepts all vanilla item grants (chests, NPCs, bosses, shops)
+2. **Connects to AP server** — WebSocket client sends location checks and receives items
+3. **Suppresses unauthorized items** — only items granted by AP are allowed in inventory
+4. **Monitors memory flags** — detects location checks via flag transitions
+5. **Syncs on save load** — re-applies AP state whenever a save file is loaded
 
-Both must be set to 1 for an item to be usable.
+## Legal
 
-### Memory Addresses (Ys I)
-| Address | Description |
-|---------|-------------|
-| `0x0175C20` | Current HP |
-| `0x0175C24` | Max HP |
-| `0x0175C28` | Attack |
-| `0x0175C2C` | Defense |
-| `0x0175C30` | Gold |
-| `0x0175A98` | Equipped Weapon |
-| `0x0175A9C` | Equipped Armor |
-| `0x0175AA0` | Equipped Shield |
-| `0x0175AA4` | Equipped Ring |
+This project requires a legally purchased copy of Ys I & II Chronicles+. No game code or assets are distributed. All interaction is through runtime memory hooks and the Archipelago protocol.
 
-## Resources
+Ys I & II Chronicles+ is developed by Nihon Falcom and published by XSEED Games.
 
-- [Archipelago Documentation](https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/adding%20games.md)
-- [PPSSPP Debugger API](https://forums.ppsspp.org/showthread.php?tid=23592)
+## License
+
+MIT
+
+## Links
+
+- [Archipelago](https://archipelago.gg)
 - [Ys Wiki](https://isu.fandom.com/wiki/Ys_Wiki)
-
-## Contributing
-
-This is a personal project. Feel free to fork if you want to help!
