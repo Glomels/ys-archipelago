@@ -20,4 +20,4 @@ All treasure chests, NPC gifts, and boss rewards are shuffled. This includes:
 
 ## What is the goal?
 
-The default goal is to defeat Dark Fact at the top of Darm Tower. This requires collecting all 6 Books of Ys and obtaining the Blue Amulet from Luta Gemma.
+The default goal is to defeat Dark Fact at the top of Darm Tower. This requires collecting all 6 Books of Ys.
