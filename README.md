@@ -25,7 +25,7 @@ An [Archipelago](https://archipelago.gg) multiworld randomizer for **Ys I Chroni
 
 ### Build from source
 
-See [SETUP.md](SETUP.md) for full instructions. Requires `i686-w64-mingw32-gcc`.
+Requires `i686-w64-mingw32-gcc` (`brew install mingw-w64` on macOS).
 
 ```bash
 # Build everything
