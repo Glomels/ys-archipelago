@@ -28,6 +28,7 @@ tools/sni/
 
 # Local config
 .pip/
+.env
 
 # Memory snapshots (potentially large)
 *.memdump

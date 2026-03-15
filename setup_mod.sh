@@ -12,11 +12,17 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-GAME_DIR="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c/Program Files (x86)/Steam/steamapps/common/Ys I"
 
-SERVER="${1:-localhost:38281}"
-SLOT="${2:-Adol}"
-PASSWORD="${3:-}"
+# Load environment config
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    source "$SCRIPT_DIR/.env"
+fi
+
+GAME_DIR="${GAME_DIR:-$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c/Program Files (x86)/Steam/steamapps/common/Ys I}"
+
+SERVER="${1:-${AP_SERVER:-localhost:38281}}"
+SLOT="${2:-${AP_SLOT:-Adol}}"
+PASSWORD="${3:-${AP_PASSWORD:-}}"
 
 CC=i686-w64-mingw32-gcc
 

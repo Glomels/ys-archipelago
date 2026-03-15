@@ -2,10 +2,17 @@
 # Ys I Chronicles - Memory tools launcher
 # Runs Windows .exe helpers inside CrossOver Wine
 
-export WINEPREFIX="/Users/luis/Library/Application Support/CrossOver/Bottles/Steam"
+SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Load environment config
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    source "$SCRIPT_DIR/.env"
+fi
+
+export WINEPREFIX="${WINEPREFIX:-$HOME/Library/Application Support/CrossOver/Bottles/Steam}"
 export WINEDEBUG=-all
 export WINEMSYNC=1
-WINE="/Users/luis/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib/wine/x86_64-unix/wine"
+WINE="${WINE:-$HOME/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib/wine/x86_64-unix/wine}"
 DRIVE_C="$WINEPREFIX/drive_c"
 
 # Item name lookup
@@ -172,8 +179,8 @@ case "${1:-}" in
 
     ap-give)
         # Give items through the DLL's ap_give (sets permitted flag)
-        GAME_DIR="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c/Program Files (x86)/Steam/steamapps/common/Ys I"
-        GIVE_FILE="$GAME_DIR/ap_give.txt"
+        AP_GAME_DIR="${GAME_DIR:-$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c/Program Files (x86)/Steam/steamapps/common/Ys I}"
+        GIVE_FILE="$AP_GAME_DIR/ap_give.txt"
         shift
         if [ $# -eq 0 ]; then
             echo "Usage: $0 ap-give <id> [id] [id] ..."
