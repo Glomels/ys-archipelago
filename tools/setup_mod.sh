@@ -12,10 +12,11 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Load environment config
-if [ -f "$SCRIPT_DIR/.env" ]; then
-    source "$SCRIPT_DIR/.env"
+if [ -f "$ROOT_DIR/.env" ]; then
+    source "$ROOT_DIR/.env"
 fi
 
 if [ -z "$GAME_DIR" ]; then
@@ -48,11 +49,11 @@ fi
 
 # Step 1: Compile DLLs
 echo "[1/4] Compiling aphook.dll..."
-$CC -shared -O2 -o "$SCRIPT_DIR/player/aphook.dll" "$SCRIPT_DIR/src/aphook.c" -lws2_32 -lkernel32
+$CC -shared -O2 -o "$ROOT_DIR/player/aphook.dll" "$ROOT_DIR/src/aphook.c" -lws2_32 -lkernel32
 echo "  OK"
 
 echo "[1/4] Compiling steam_api.dll (proxy)..."
-$CC -shared -O2 -o "$SCRIPT_DIR/player/steam_api.dll" \
+$CC -shared -O2 -o "$ROOT_DIR/player/steam_api.dll" \
     "$SCRIPT_DIR/src/steam_api_proxy.c" "$SCRIPT_DIR/src/steam_api_proxy.def" -lkernel32
 echo "  OK"
 
@@ -70,7 +71,7 @@ fi
 
 # Step 3: Deploy DLLs
 echo "[3/4] Deploying to game directory..."
-cp "$SCRIPT_DIR/player/steam_api.dll" "$GAME_DIR/steam_api.dll"
+cp "$ROOT_DIR/player/steam_api.dll" "$GAME_DIR/steam_api.dll"
 cp "$SCRIPT_DIR/player/aphook.dll" "$GAME_DIR/aphook.dll"
 echo "  steam_api.dll (proxy) → installed"
 echo "  aphook.dll            → installed"

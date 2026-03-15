@@ -1,7 +1,10 @@
 #!/bin/bash
 # Build script for Ys Chronicles AP mod
 
-cd "$(dirname "$0")"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+cd "$ROOT_DIR"
 
 CC=i686-w64-mingw32-gcc
 
@@ -23,12 +26,20 @@ else
 fi
 
 # Remove old apworld
-rm -f ys_chronicles.apworld player/ys_chronicles.apworld
+rm -f player/ys_chronicles.apworld
 
-# Package from apworld directory
-cd apworld
-zip -r ../player/ys_chronicles.apworld ys_chronicles -x "*.pyc" -x "*/__pycache__/*" -x "*.DS_Store"
-cp ../player/ys_chronicles.apworld ../ys_chronicles.apworld
+# Package world files from root into ys_chronicles/ inside the zip
+mkdir -p /tmp/ys_apworld/ys_chronicles
+cp "$ROOT_DIR"/__init__.py "$ROOT_DIR"/items.py "$ROOT_DIR"/locations.py \
+   "$ROOT_DIR"/regions.py "$ROOT_DIR"/options.py "$ROOT_DIR"/client.py \
+   "$ROOT_DIR"/archipelago.json \
+   "$ROOT_DIR/en_Ys I Chronicles.md" \
+   "$ROOT_DIR/en_setup_Ys I Chronicles.md" \
+   /tmp/ys_apworld/ys_chronicles/
+
+cd /tmp/ys_apworld
+zip -r "$ROOT_DIR/player/ys_chronicles.apworld" ys_chronicles -x "*.pyc" -x "*/__pycache__/*" -x "*.DS_Store"
+rm -rf /tmp/ys_apworld
 
 echo ""
 echo "Built: player/ys_chronicles.apworld"
