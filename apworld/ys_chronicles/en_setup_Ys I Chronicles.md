@@ -2,46 +2,52 @@
 
 ## Required Software
 
-- [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) (0.5.0 or later)
-- [PPSSPP](https://www.ppsspp.org/) (PSP emulator)
-- Ys I & II Chronicles (USA) ISO (ULUS-10547)
-- Python 3.8+ with `websockets` library
+- [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) (0.6.6 or later)
+- Ys I & II Chronicles+ (Steam, PC version)
+- CrossOver or Wine (for macOS/Linux)
+- i686-w64-mingw32-gcc (32-bit cross-compiler)
 
 ## Installation
 
-1. Download the Ys I Chronicles APWorld file
-2. Place it in your Archipelago `custom_worlds` folder
-3. Install the websockets library: `pip install websockets`
+1. Build the apworld and DLL: `./build_apworld.sh`
+2. Copy `ys_chronicles.apworld` to your Archipelago worlds directory
+3. Deploy the mod to your game directory: `./setup_mod.sh`
 
-## PPSSPP Setup
+## Game Setup
 
-1. Open PPSSPP
-2. Go to **Settings** → **Tools** → **Developer tools**
-3. Enable **"Allow remote debugger"**
-4. Load the Ys I & II Chronicles ISO
-5. Start a new game or load a save in Ys I
+1. The mod installs as a `steam_api.dll` proxy — no game files are modified
+2. Create `ap_connect.txt` in your game directory with your server info:
+   ```
+   server=localhost:38281
+   slot=YourName
+   password=
+   ```
+3. Launch the game normally through Steam or CrossOver
 
 ## Joining a Multiworld
 
-1. Generate a seed on the Archipelago website or with the Archipelago Launcher
-2. Start PPSSPP with the game loaded
-3. Run the Ys Chronicles client: `python ys_client.py`
-4. The client will auto-detect PPSSPP and connect
-5. Enter your room info to connect to the Archipelago server
+1. Generate a seed using `ArchipelagoGenerate` with your YAML config
+2. Host the server using `ArchipelagoServer` with the generated zip
+3. Launch the game — the mod connects automatically
+4. Connection status is displayed on screen (green = connected)
 
 ## Gameplay
 
 - Play the game normally
-- When you find items, they are sent to the multiworld
-- Items you receive from other players appear automatically
-- Check your client for hints and item notifications
+- Chests, NPC gifts, boss kills, and shop purchases are location checks
+- Items you receive from other players appear automatically in your inventory
+- The AP server is the source of truth — your inventory syncs on every save load
 
 ## Troubleshooting
 
-**Client can't connect to PPSSPP:**
-- Make sure remote debugger is enabled in PPSSPP settings
-- Check that the game is loaded and you're in gameplay (not title screen)
+**"AP: Connecting..." won't go green:**
+- Check that the server is running and `ap_connect.txt` has the correct address
+- Check `aphook.log` in the game directory for error details
 
-**Items not appearing:**
-- The client must be running to receive items
-- Some items may require exiting and re-entering an area to appear
+**Items disappearing:**
+- The mod suppresses items not granted by the AP server
+- Use `ys.sh ap-give <id>` for debug item grants that persist
+
+**Game crashes:**
+- Never use `ys.sh items` while the game is running
+- Check `aphook.log` for crash diagnostics
