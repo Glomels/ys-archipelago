@@ -11,8 +11,8 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 GAME_DIR="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c/Program Files (x86)/Steam/steamapps/common/Ys I"
-TOOLS_DIR="$(cd "$(dirname "$0")/tools" && pwd)"
 
 SERVER="${1:-localhost:38281}"
 SLOT="${2:-Adol}"
@@ -39,11 +39,11 @@ fi
 
 # Step 1: Compile DLLs
 echo "[1/4] Compiling aphook.dll..."
-$CC -shared -O2 -o "$TOOLS_DIR/aphook.dll" "$SCRIPT_DIR/src/aphook.c" -lws2_32 -lkernel32
+$CC -shared -O2 -o "$SCRIPT_DIR/player/aphook.dll" "$SCRIPT_DIR/src/aphook.c" -lws2_32 -lkernel32
 echo "  OK"
 
 echo "[1/4] Compiling steam_api.dll (proxy)..."
-$CC -shared -O2 -o "$TOOLS_DIR/steam_api.dll" \
+$CC -shared -O2 -o "$SCRIPT_DIR/player/steam_api.dll" \
     "$SCRIPT_DIR/src/steam_api_proxy.c" "$SCRIPT_DIR/src/steam_api_proxy.def" -lkernel32
 echo "  OK"
 
@@ -61,8 +61,8 @@ fi
 
 # Step 3: Deploy DLLs
 echo "[3/4] Deploying to game directory..."
-cp "$TOOLS_DIR/steam_api.dll" "$GAME_DIR/steam_api.dll"
-cp "$TOOLS_DIR/aphook.dll" "$GAME_DIR/aphook.dll"
+cp "$SCRIPT_DIR/player/steam_api.dll" "$GAME_DIR/steam_api.dll"
+cp "$SCRIPT_DIR/player/aphook.dll" "$GAME_DIR/aphook.dll"
 echo "  steam_api.dll (proxy) → installed"
 echo "  aphook.dll            → installed"
 
