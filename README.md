@@ -27,10 +27,10 @@ Randomizes item locations across the game — chests, NPC gifts, boss rewards, a
 ### Quick install (precompiled)
 
 1. Back up your game's `steam_api.dll` by renaming it to `steam_api_orig.dll`
-2. Copy both DLLs from the `patch/` directory into your game folder:
+2. Copy both DLLs from the `patch/` directory into the same folder as `ys1plus.exe`:
    - `steam_api.dll` — proxy that loads the AP client
    - `aphook.dll` — full AP client
-3. Create `ap_connect.txt` in the game folder:
+3. Create `ap_connect.txt` in the same folder as `ys1plus.exe`:
    ```
    server=localhost:38281
    slot=Adol
