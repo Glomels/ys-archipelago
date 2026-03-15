@@ -24,7 +24,23 @@ Randomizes item locations across the game — chests, NPC gifts, boss rewards, a
 
 ## Setup
 
-See [SETUP.md](SETUP.md) for full installation and configuration instructions.
+### Quick install (precompiled)
+
+1. Back up your game's `steam_api.dll` by renaming it to `steam_api_orig.dll`
+2. Copy both DLLs from the `patch/` directory into your game folder:
+   - `steam_api.dll` — proxy that loads the AP client
+   - `aphook.dll` — full AP client
+3. Create `ap_connect.txt` in the game folder:
+   ```
+   server=localhost:38281
+   slot=Adol
+   password=
+   ```
+4. Launch the game normally
+
+### Build from source
+
+See [SETUP.md](SETUP.md) for full instructions. Requires `i686-w64-mingw32-gcc`.
 
 ```bash
 # Build everything
