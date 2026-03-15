@@ -1,6 +1,6 @@
 # Ys I Chronicles — Archipelago Randomizer
 
-An [Archipelago](https://archipelago.gg) multiworld randomizer for **Ys I Chronicles+** (Steam PC version).
+An [Archipelago](https://archipelago.gg) multiworld randomizer for **Ys I Chronicles+** (Steam PC version). Currently supports Ys I only; Ys II support may be added in the future.
 
 ## Requirements
 
