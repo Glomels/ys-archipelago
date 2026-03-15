@@ -143,10 +143,6 @@ class YsChroniclesWorld(World):
             self.multiworld.push_precollected(self.create_item("Long Sword"))
             excluded_items.add("Long Sword")
 
-        # Handle Evil Ring option
-        if not self.options.include_evil_ring:
-            excluded_items.add("Evil Ring")
-
         # Create items based on shuffle options
         for item_name, item_data in YS1_ITEMS.items():
             if item_name in excluded_items:
@@ -200,10 +196,15 @@ class YsChroniclesWorld(World):
             regions[region_name] = region
             self.multiworld.regions.append(region)
 
+        shop_checks_enabled = bool(self.options.shuffle_shops)
+
         # Create locations and add to regions
         for loc_name, loc_data in YS1_LOCATIONS.items():
             # Skip boss locations if boss checks are disabled
             if loc_data.loc_type == YsLocationType.BOSS and not boss_checks_enabled:
+                continue
+            # Skip shop locations if shop checks are disabled
+            if loc_data.loc_type == YsLocationType.SHOP and not shop_checks_enabled:
                 continue
 
             region = regions.get(loc_data.region)
@@ -257,20 +258,21 @@ class YsChroniclesWorld(World):
             silver_bell_loc.item_rule = lambda item: item.name != "Silver Bell"
 
         # Set completion condition based on goal
+        # Dark Fact is a location in Tower Upper gated by Blue Amulet
         if self.options.goal == 0:  # Dark Fact
             self.multiworld.completion_condition[self.player] = \
-                lambda state: state.can_reach_region("Tower Top", self.player)
+                lambda state: state.can_reach_location("Boss: Dark Fact", self.player)
         elif self.options.goal == 1:  # All Books
             from .regions import has_all_books
             self.multiworld.completion_condition[self.player] = \
                 lambda state: (
                     has_all_books(state, self.player) and
-                    state.can_reach_region("Tower Top", self.player)
+                    state.can_reach_location("Boss: Dark Fact", self.player)
                 )
         elif self.options.goal == 2:  # All Bosses
             self.multiworld.completion_condition[self.player] = \
                 lambda state: (
-                    state.can_reach_region("Tower Top", self.player) and
+                    state.can_reach_location("Boss: Dark Fact", self.player) and
                     state.can_reach_region("Shrine B3", self.player) and
                     state.can_reach_region("Mine B2", self.player) and
                     state.can_reach_region("Tower F8", self.player) and
@@ -293,14 +295,38 @@ class YsChroniclesWorld(World):
         """Called before filling locations with items."""
         pass
 
+    # Items used for tower-internal progression
+    TOWER_INTERNAL_ITEMS = {
+        "Hammer", "Rod", "Blue Amulet", "Blue Necklace", "Monocle",
+        "Idol", "Mask of Eyes",
+    }
+    TOWER_REGIONS = {
+        "Tower Lower", "Tower F8", "Tower Mid", "Tower F14", "Tower Upper",
+    }
+
     def fill_slot_data(self) -> Dict[str, Any]:
         """Data sent to the client."""
+        # Find tower-internal items placed in overworld locations.
+        # The client uses this to auto-warp the player back if they
+        # enter the tower without collecting these.
+        tower_items_in_overworld = []
+        for loc_name, loc_data in YS1_LOCATIONS.items():
+            if loc_data.region in self.TOWER_REGIONS:
+                continue
+            location = self.multiworld.get_location(loc_name, self.player)
+            if (location and location.item and
+                    location.item.player == self.player and
+                    location.item.name in self.TOWER_INTERNAL_ITEMS):
+                game_id = YS1_ITEMS[location.item.name].game_id
+                tower_items_in_overworld.append(game_id)
+
         return {
             "goal": self.options.goal.value,
             "boss_checks": bool(self.options.boss_checks),
             "death_link": self.options.death_link.value,
             "experience_multiplier": self.options.experience_multiplier.value,
             "gold_multiplier": self.options.gold_multiplier.value,
+            "tower_items_in_overworld": tower_items_in_overworld,
         }
 
     # -------------------------------------------------------------------------

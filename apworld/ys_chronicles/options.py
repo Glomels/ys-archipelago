@@ -19,7 +19,7 @@ class Goal(Choice):
     What is required to complete the game.
 
     Dark Fact: Defeat Dark Fact (standard ending)
-    All Books: Collect all 6 Books of Ys, then defeat Dark Fact
+    All Books: Collect all 6 Books of Ys and defeat Dark Fact
     All Bosses: Defeat all bosses 
     """
     display_name = "Goal"
@@ -67,12 +67,13 @@ class ShuffleConsumables(Toggle):
     display_name = "Shuffle Consumables"
 
 
-class IncludeEvilRing(Toggle):
+class ShuffleShops(DefaultOnToggle):
     """
-    Include the Evil Ring as a trap item.
-    When received, it may cause damage if equipped without Blue Necklace.
+    Shop purchases are location checks.
+    First purchase of each shop item gives the randomized item.
+    Subsequent purchases give the vanilla item.
     """
-    display_name = "Include Evil Ring (Trap)"
+    display_name = "Shuffle Shops"
 
 
 class BossChecks(DefaultOnToggle):
@@ -109,7 +110,7 @@ class StartingWeapon(Choice):
     option_none = 0
     option_short_sword = 1
     option_long_sword = 2
-    default = 1
+    default = 0
 
 
 class ExperienceMultiplier(Range):
@@ -152,7 +153,7 @@ class YsChroniclesOptions(PerGameCommonOptions):
     shuffle_keys: ShuffleKeys
     shuffle_quest_items: ShuffleQuestItems
     shuffle_consumables: ShuffleConsumables
-    include_evil_ring: IncludeEvilRing
+    shuffle_shops: ShuffleShops
     boss_checks: BossChecks
     boss_randomization: BossRandomization
     starting_weapon: StartingWeapon

@@ -16,6 +16,7 @@ class YsLocationType(IntEnum):
     BOSS = 2
     EVENT = 3
     PICKUP = 4
+    SHOP = 5
 
 
 class YsLocationData(NamedTuple):
@@ -105,17 +106,17 @@ YS1_LOCATIONS: Dict[str, YsLocationData] = {
     # Shrine F1
     # -------------------------------------------------------------------------
     "Shrine F1 - Shield Ring Chest": YsLocationData(
-        code=YS1_LOCATION_BASE_ID + 11, region="Shrine F1",
+        code=YS1_LOCATION_BASE_ID + 11, region="Shrine",
         loc_type=YsLocationType.CHEST, vanilla_item="Shield Ring",
         memory_flag=0x5318A0,  # locked chest
     ),
     "Shrine F1 - Ruby Chest": YsLocationData(
-        code=YS1_LOCATION_BASE_ID + 10, region="Shrine F1",
+        code=YS1_LOCATION_BASE_ID + 10, region="Shrine",
         loc_type=YsLocationType.CHEST, vanilla_item="Ruby",
         memory_flag=0x5318A4,
     ),
     "Shrine F1 - Necklace Chest": YsLocationData(
-        code=YS1_LOCATION_BASE_ID + 12, region="Shrine F1",
+        code=YS1_LOCATION_BASE_ID + 12, region="Shrine",
         loc_type=YsLocationType.CHEST, vanilla_item="Necklace",
         memory_flag=0x5318A8,  # locked chest
     ),
@@ -173,7 +174,7 @@ YS1_LOCATIONS: Dict[str, YsLocationData] = {
         memory_flag=0x5318CC,
     ),
     "Boss: Jenocres": YsLocationData(
-        code=YS1_LOCATION_BASE_ID + 100, region="Shrine B3",
+        code=YS1_LOCATION_BASE_ID + 100, region="Shrine",
         loc_type=YsLocationType.BOSS, vanilla_item="Book of Ys (Hadal)",
         memory_flag=0x531950,
     ),
@@ -389,9 +390,82 @@ YS1_LOCATIONS: Dict[str, YsLocationData] = {
     # Darm Tower - Top (F22-F25)
     # -------------------------------------------------------------------------
     "Boss: Dark Fact": YsLocationData(
-        code=YS1_LOCATION_BASE_ID + 106, region="Tower Top",
+        code=YS1_LOCATION_BASE_ID + 106, region="Tower Upper",
         loc_type=YsLocationType.BOSS, vanilla_item="Book of Ys (Fact)",
         memory_flag=0x531A98,
+    ),
+
+    # -------------------------------------------------------------------------
+    # Shops — Pim's (Minea)
+    # -------------------------------------------------------------------------
+    "Pim's Shop - Sapphire Ring": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 200, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Sapphire Ring",
+        memory_flag=0,  # detected by hook (caller 0x493475, game_id 41)
+    ),
+    "Pim's Shop - Mirror": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 201, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Mirror",
+        memory_flag=0,  # detected by hook (caller 0x493525, game_id 45)
+    ),
+    "Pim's Shop - Wing": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 202, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Wing",
+        memory_flag=0,  # detected by hook (caller 0x4935D5, game_id 47)
+    ),
+
+    # -------------------------------------------------------------------------
+    # Shops — Weapon/Armor Dealer (Minea & Zepik)
+    # -------------------------------------------------------------------------
+    "Shop - Short Sword": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 210, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Short Sword",
+        memory_flag=0,  # game_id 0
+    ),
+    "Shop - Long Sword": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 211, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Long Sword",
+        memory_flag=0,  # game_id 1
+    ),
+    "Shop - Talwar": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 212, region="Zepik",
+        loc_type=YsLocationType.SHOP, vanilla_item="Talwar",
+        memory_flag=0,  # game_id 2
+    ),
+    "Shop - Small Shield": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 213, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Small Shield",
+        memory_flag=0,  # game_id 5
+    ),
+    "Shop - Middle Shield": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 214, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Middle Shield",
+        memory_flag=0,  # game_id 6
+    ),
+    "Shop - Large Shield": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 215, region="Zepik",
+        loc_type=YsLocationType.SHOP, vanilla_item="Large Shield",
+        memory_flag=0,  # game_id 7
+    ),
+    "Shop - Chain Mail": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 216, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Chain Mail",
+        memory_flag=0,  # game_id 10
+    ),
+    "Shop - Plate Mail": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 217, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Plate Mail",
+        memory_flag=0,  # game_id 11
+    ),
+    "Shop - Reflex": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 218, region="Zepik",
+        loc_type=YsLocationType.SHOP, vanilla_item="Reflex",
+        memory_flag=0,  # game_id 12
+    ),
+    "Shop - Heal Potion": YsLocationData(
+        code=YS1_LOCATION_BASE_ID + 219, region="Minea",
+        loc_type=YsLocationType.SHOP, vanilla_item="Heal Potion",
+        memory_flag=0,  # game_id 44
     ),
 }
 

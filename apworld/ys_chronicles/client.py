@@ -16,6 +16,7 @@ import hashlib
 import os
 import platform
 import struct
+import tempfile
 from typing import Optional, Dict, Set, List
 
 # Archipelago imports
@@ -326,7 +327,10 @@ def create_memory_interface() -> MemoryInterface:
 class YsGameState:
     """Tracks Ys I game state by polling memory."""
 
-    def __init__(self, mem: MemoryInterface):
+    # Path to the permitted items file read by itemhook.dll
+    PERMIT_FILE = "C:\\ap_items.txt"
+
+    def __init__(self, mem: MemoryInterface, wineprefix: Optional[str] = None):
         self.mem = mem
 
         # Flag tracking
@@ -335,6 +339,7 @@ class YsGameState:
 
         # Item tracking for AP
         self.ap_received_items: Set[int] = set()  # game_ids received from AP
+        self.permitted_ids: Set[int] = set()       # game_ids permitted by itemhook
         self.received_item_index: int = 0
 
         # Save/load detection
@@ -344,6 +349,34 @@ class YsGameState:
         self.last_hp: int = 0
         self.last_exp: int = 0
         self.last_gold: int = 0
+
+        # Resolve native paths
+        if wineprefix:
+            drive_c = os.path.join(wineprefix, "drive_c")
+        elif platform.system() == "Windows":
+            drive_c = "C:\\"
+        else:
+            drive_c = os.path.expanduser(
+                "~/Library/Application Support/CrossOver/Bottles/Steam/drive_c"
+            )
+        self._permit_path = os.path.join(drive_c, "ap_items.txt")
+
+    def write_permitted_file(self):
+        """Write permitted item IDs to C:\\ap_items.txt atomically."""
+        dir_path = os.path.dirname(self._permit_path)
+        try:
+            fd, tmp = tempfile.mkstemp(dir=dir_path, suffix=".tmp")
+            with os.fdopen(fd, 'w') as f:
+                for gid in sorted(self.permitted_ids):
+                    f.write(f"{gid}\n")
+            if platform.system() == "Windows":
+                try:
+                    os.remove(self._permit_path)
+                except OSError:
+                    pass
+            os.rename(tmp, self._permit_path)
+        except Exception as e:
+            print(f"Failed to write permitted file: {e}")
 
     async def is_in_game(self) -> bool:
         """Check if the player is actively in Ys I gameplay."""
@@ -386,8 +419,12 @@ class YsGameState:
     # ----- Item Give/Remove -----
 
     async def give_item(self, game_id: int) -> bool:
-        """Give an item. Sets both Array 1 (ownership) and Array 2 (visibility)."""
+        """Give an item. Permits it in itemhook, then sets both arrays."""
         try:
+            # Permit first so the DLL won't suppress the write
+            self.permitted_ids.add(game_id)
+            self.write_permitted_file()
+
             addr1 = PCAddresses.item_array1_addr(game_id)
             addr2 = PCAddresses.item_array2_addr(game_id)
             ok1 = await self.mem.write_u32(addr1, 1)
@@ -400,14 +437,12 @@ class YsGameState:
             return False
 
     async def remove_item(self, game_id: int) -> bool:
-        """Remove an item. MUST zero Array 2 FIRST, then Array 1."""
+        """Remove an item. Revoke permit, then DLL handles zeroing."""
         try:
-            addr1 = PCAddresses.item_array1_addr(game_id)
-            addr2 = PCAddresses.item_array2_addr(game_id)
-            # CRITICAL ORDER: Array 2 first, then Array 1
-            ok2 = await self.mem.write_u32(addr2, 0)
-            ok1 = await self.mem.write_u32(addr1, 0)
-            return ok1 and ok2
+            self.permitted_ids.discard(game_id)
+            self.write_permitted_file()
+            # DLL will zero the arrays on next poll (~16ms)
+            return True
         except Exception as e:
             print(f"remove_item({game_id}) error: {e}")
             return False
@@ -458,6 +493,45 @@ class YsGameState:
 
         self.last_item_checksum = checksum
         return False
+
+    # ----- Tower Entry Guard -----
+
+    # Goban interaction flags — triggers tower entry cutscene
+    GOBAN_FLAGS = [0x531CE4, 0x531CE8, 0x531CEC]
+
+    async def guard_tower_entry(self, tower_items_in_overworld: List[int]):
+        """Block Goban's tower entry if player is missing tower items
+        that were randomized to overworld locations."""
+        if not tower_items_in_overworld:
+            return
+
+        # Check if Goban interaction just triggered
+        try:
+            goban_triggered = False
+            for flag_addr in self.GOBAN_FLAGS:
+                val = await self.mem.read_u32(flag_addr)
+                if val != 0:
+                    goban_triggered = True
+                    break
+
+            if not goban_triggered:
+                return
+
+            # Check if player has all required items
+            missing = []
+            for game_id in tower_items_in_overworld:
+                addr = PCAddresses.item_array1_addr(game_id)
+                val = await self.mem.read_u32(addr)
+                if val == 0:
+                    missing.append(game_id)
+
+            if missing:
+                # Suppress Goban — zero all flags back
+                for flag_addr in self.GOBAN_FLAGS:
+                    await self.mem.write_u32(flag_addr, 0)
+                print("Tower entry blocked! You are missing required items.")
+        except Exception:
+            pass
 
     # ----- Death Link -----
 
@@ -560,6 +634,7 @@ if ARCHIPELAGO_AVAILABLE:
             self.game_state: Optional[YsGameState] = None
             self.slot_data: Dict = {}
             self.mem_connected = False
+            self.dll_injected = False
             self.game_poll_task: Optional[asyncio.Task] = None
 
         async def server_auth(self, password_requested: bool = False):
@@ -589,6 +664,36 @@ if ARCHIPELAGO_AVAILABLE:
                 checked = args.get("checked_locations", [])
                 if checked and self.game_state:
                     self.game_state.checked_locations.update(checked)
+
+        async def _inject_itemhook(self):
+            """Inject itemhook.dll into the game process."""
+            try:
+                if isinstance(self.mem, WineMemoryInterface):
+                    result = await asyncio.create_subprocess_exec(
+                        self.mem.wine_path, "C:\\inject.exe", "C:\\itemhook.dll",
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                        env=self.mem._env(),
+                    )
+                    stdout, stderr = await result.communicate()
+                    if result.returncode == 0:
+                        print("Injected itemhook.dll")
+                    else:
+                        print(f"itemhook injection failed: {stderr.decode().strip()}")
+                else:
+                    # Windows native
+                    result = await asyncio.create_subprocess_exec(
+                        "inject.exe", "C:\\itemhook.dll",
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+                    stdout, stderr = await result.communicate()
+                    if result.returncode == 0:
+                        print("Injected itemhook.dll")
+                    else:
+                        print(f"itemhook injection failed: {stderr.decode().strip()}")
+            except Exception as e:
+                print(f"itemhook injection error: {e}")
 
         async def _process_received_items(self, items: list, start_index: int):
             """Process received items and inject them into the game."""
@@ -628,9 +733,16 @@ if ARCHIPELAGO_AVAILABLE:
                     if not self.mem_connected:
                         self.mem = create_memory_interface()
                         if await self.mem.connect():
-                            self.game_state = YsGameState(self.mem)
+                            wineprefix = getattr(self.mem, 'wineprefix', None)
+                            self.game_state = YsGameState(self.mem, wineprefix=wineprefix)
                             self.mem_connected = True
                             print("Connected to ys1plus.exe!")
+
+                            # Initialize permitted file and inject itemhook DLL
+                            if not self.dll_injected:
+                                self.game_state.write_permitted_file()
+                                await self._inject_itemhook()
+                                self.dll_injected = True
                         else:
                             await asyncio.sleep(5)
                             continue
@@ -652,18 +764,23 @@ if ARCHIPELAGO_AVAILABLE:
                         }])
                         print(f"Sent {len(new_checks)} location checks")
 
-                    # 3. EXP/Gold multipliers
+                    # 3. Tower entry guard
+                    tower_items = self.slot_data.get("tower_items_in_overworld", [])
+                    if tower_items:
+                        await self.game_state.guard_tower_entry(tower_items)
+
+                    # 4. EXP/Gold multipliers
                     exp_mult = self.slot_data.get("experience_multiplier", 100) / 100.0
                     gold_mult = self.slot_data.get("gold_multiplier", 100) / 100.0
                     if exp_mult != 1.0 or gold_mult != 1.0:
                         await self.game_state.apply_multipliers(exp_mult, gold_mult)
 
-                    # 4. Death link
+                    # 5. Death link
                     if self.slot_data.get("death_link", False):
                         if await self.game_state.check_death():
                             await self.send_death()
 
-                    # 5. Goal check
+                    # 6. Goal check
                     goal = self.slot_data.get("goal", 0)
                     if not self.finished_game and await self.game_state.check_goal(goal):
                         await self.send_msgs([{

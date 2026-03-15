@@ -23,6 +23,7 @@ class YsItemType(IntEnum):
     CONSUMABLE = 6
     BOOK = 7
     TRAP = 8
+    TREASURE = 9
 
 
 class YsItemData(NamedTuple):
@@ -133,8 +134,8 @@ YS1_ITEMS: Dict[str, YsItemData] = {
         classification=ItemClassification.useful, game_id=18,
     ),
     "Evil Ring": YsItemData(
-        code=YS1_BASE_ID + 34, item_type=YsItemType.TRAP,
-        classification=ItemClassification.trap, game_id=19,
+        code=YS1_BASE_ID + 34, item_type=YsItemType.RING,
+        classification=ItemClassification.progression, game_id=19,
     ),
 
     # -------------------------------------------------------------------------
@@ -240,6 +241,10 @@ YS1_ITEMS: Dict[str, YsItemData] = {
         code=YS1_BASE_ID + 70, item_type=YsItemType.QUEST,
         classification=ItemClassification.progression, game_id=46,
     ),
+    "Sapphire Ring": YsItemData(
+        code=YS1_BASE_ID + 71, item_type=YsItemType.QUEST,
+        classification=ItemClassification.useful, game_id=41,
+    ),
 
     # -------------------------------------------------------------------------
     # Consumables / Treasures
@@ -248,25 +253,25 @@ YS1_ITEMS: Dict[str, YsItemData] = {
         code=YS1_BASE_ID + 80, item_type=YsItemType.CONSUMABLE,
         classification=ItemClassification.filler, game_id=44,
     ),
-    "Mirror": YsItemData(
-        code=YS1_BASE_ID + 81, item_type=YsItemType.CONSUMABLE,
-        classification=ItemClassification.useful, game_id=45,
-    ),
     "Wing": YsItemData(
         code=YS1_BASE_ID + 82, item_type=YsItemType.CONSUMABLE,
+        classification=ItemClassification.useful, game_id=45,
+    ),
+    "Mirror": YsItemData(
+        code=YS1_BASE_ID + 81, item_type=YsItemType.CONSUMABLE,
         classification=ItemClassification.useful, game_id=47,
     ),
     "Ruby": YsItemData(
-        code=YS1_BASE_ID + 83, item_type=YsItemType.CONSUMABLE,
-        classification=ItemClassification.filler, game_id=40,
+        code=YS1_BASE_ID + 83, item_type=YsItemType.TREASURE,
+        classification=ItemClassification.useful, game_id=40,
     ),
     "Golden Vase": YsItemData(
-        code=YS1_BASE_ID + 84, item_type=YsItemType.CONSUMABLE,
-        classification=ItemClassification.filler, game_id=43,
+        code=YS1_BASE_ID + 84, item_type=YsItemType.TREASURE,
+        classification=ItemClassification.useful, game_id=43,
     ),
     "Necklace": YsItemData(
-        code=YS1_BASE_ID + 85, item_type=YsItemType.CONSUMABLE,
-        classification=ItemClassification.filler, game_id=42,
+        code=YS1_BASE_ID + 85, item_type=YsItemType.TREASURE,
+        classification=ItemClassification.useful, game_id=42,
     ),
     "Bestiary Potion": YsItemData(
         code=YS1_BASE_ID + 86, item_type=YsItemType.CONSUMABLE,
