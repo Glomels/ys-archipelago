@@ -18,7 +18,10 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     source "$SCRIPT_DIR/.env"
 fi
 
-GAME_DIR="${GAME_DIR:-$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c/Program Files (x86)/Steam/steamapps/common/Ys I}"
+if [ -z "$GAME_DIR" ]; then
+    echo "ERROR: GAME_DIR not set. Copy .env.example to .env and edit it."
+    exit 1
+fi
 
 SERVER="${1:-${AP_SERVER:-localhost:38281}}"
 SLOT="${2:-${AP_SLOT:-Adol}}"

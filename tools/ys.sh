@@ -9,10 +9,14 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     source "$SCRIPT_DIR/.env"
 fi
 
-export WINEPREFIX="${WINEPREFIX:-$HOME/Library/Application Support/CrossOver/Bottles/Steam}"
+if [ -z "$WINEPREFIX" ] || [ -z "$WINE" ]; then
+    echo "ERROR: WINEPREFIX and WINE not set. Copy .env.example to .env and edit it."
+    exit 1
+fi
+
+export WINEPREFIX
 export WINEDEBUG=-all
 export WINEMSYNC=1
-WINE="${WINE:-$HOME/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib/wine/x86_64-unix/wine}"
 DRIVE_C="$WINEPREFIX/drive_c"
 
 # Item name lookup
@@ -179,7 +183,7 @@ case "${1:-}" in
 
     ap-give)
         # Give items through the DLL's ap_give (sets permitted flag)
-        AP_GAME_DIR="${GAME_DIR:-$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c/Program Files (x86)/Steam/steamapps/common/Ys I}"
+        AP_GAME_DIR="$GAME_DIR"
         GIVE_FILE="$AP_GAME_DIR/ap_give.txt"
         shift
         if [ $# -eq 0 ]; then
